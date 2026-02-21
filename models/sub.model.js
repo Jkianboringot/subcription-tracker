@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 
 const subSchema = new mongoose.Schema(
   {
+    //in here we are jus validating the data to meet a specific requirement
+    //just like validation in laravel
     name: {
       type: String,
       required: [true, "Sub name is requiered"],
@@ -80,6 +82,12 @@ const subSchema = new mongoose.Schema(
 );
 
 //auto-calculate if renewal date if its  missing
+
+// what this does it if a renewalDate is not specified, we will take start a start date
+//and frequency, and we use those two to calculate what is the next renewal date base on
+//frequency, so let say we start at jan 1 and we have pick frequency of monthly, and we did not
+//specify the renewal date, the system will take that start date add the frequency(monthly) to it
+//so the renewalDate will become feb 1
 subSchema.pre('save',function(next){
     if(!this.renewalDate){
         const renewalPeriods={
