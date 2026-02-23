@@ -1,6 +1,11 @@
 import { Router } from "express";
+import { getUser, getUsers } from "../controllers/user.controller.js";
+import authorize from "../middlewares/auth.middleware.js";
 
 const userRoute= Router()
+
+
+
 
 // static route
 // GET /user -> get all user
@@ -8,8 +13,9 @@ const userRoute= Router()
 // dynamic route
 // GET /user:id -> get user with this id
 
-userRoute.get('/',(req,res)=>res.send({title:'Get all users'}))
-userRoute.get('/:id',(req,res)=>res.send({title:'Get user detail'}))
+userRoute.get('/',getUsers)
+userRoute.get('/:id',authorize,getUser)
+                    //middleware, this cna be change aslong it has next() in function
 
 userRoute.post('/',(req,res)=>res.send({title:'Create User'}))
 
