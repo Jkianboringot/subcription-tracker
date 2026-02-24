@@ -65,18 +65,19 @@ const subSchema = new mongoose.Schema(
       type: Date,
       validate: {
         validator: function (value) {
-          value > this.startDate;
+          if (!value) return true; // allow empty, pre-save will auto-fill
+          return value > this.startDate;
         },
         message: "renewal date must be after start date",
       },
     },
 
-    user:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User',
-        required:true,
-        index:true
-    }
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
   },
   { timestamps: true },
 );
@@ -88,32 +89,30 @@ const subSchema = new mongoose.Schema(
 //frequency, so let say we start at jan 1 and we have pick frequency of monthly, and we did not
 //specify the renewal date, the system will take that start date add the frequency(monthly) to it
 //so the renewalDate will become feb 1
-subSchema.pre('save',function(next){
-    if(!this.renewalDate){
-        const renewalPeriods={
-            daily:1,
-            weekly:7,
-            monthly:30,
-            yearly:365
+subSchema.pre('save', async function() {
+    if (!this.renewalDate) {
+        const renewalPeriods = {
+            daily: 1,
+            weekly: 7,
+            monthly: 30,
+            yearly: 365
         };
 
-        this.renewalDate=new Date(this.startDate)
-        this.renewalDate.setDate(this.renewalDate.getDate()+renewalPeriods[this.frequency])
+        this.renewalDate = new Date(this.startDate);
+        this.renewalDate.setDate(this.renewalDate.getDate() + renewalPeriods[this.frequency]);
     }
 
-    // auto update the status if renewal date has passed
-    if(this.renewalDate < new Date()){
-        this.status='expired'
+    if (this.renewalDate < new Date()) {
+        this.status = 'expired';
     }
 
+    // ❌ no next() needed
+    // remvoe next here becuase it keeped giving me next() not a function
+});
 
-    next()
-})
+const Sub = mongoose.model("Sub", subSchema);
 
-const Sub= mongoose.model('Sub',subSchema)
-
-
-export default Sub; //what ever is pass here is what can be use in other file so in here 
+export default Sub; //what ever is pass here is what can be use in other file so in here
 //if we have v1 and v2 if we pass v1 that is the only one we can access unless we do {v1,v2}
 
 //weird that this is craete in model in laravle this is in controller

@@ -16,7 +16,12 @@ const aj = arcjet({
     shield({ mode: "LIVE" }),
     // Create a bot detection rule
     detectBot({
-      mode: "LIVE", // Blocks requests. Use "DRY_RUN" to log only
+
+// ⚠️⚠️i will make it dryrun fro now but when its deploy make it live, i will only make it dryrun
+// for now becuase its messing with postman , it always give me bot which is annoying, so not good for 
+// development
+
+      mode: "DRY_RUN", // Blocks requests. Use "DRY_RUN" to log only
       // Block all bots except the following
       allow: [
         "CATEGORY:SEARCH_ENGINE", // Google, Bing, etc
