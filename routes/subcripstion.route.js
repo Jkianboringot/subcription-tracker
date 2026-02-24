@@ -1,12 +1,12 @@
 import { Router } from "express";
 import authorize from "../middlewares/auth.middleware.js"
-import {createSub, getUserSubs} from '../controllers/sub.controller.js'
+import {createSub, getSubById, getSubs, getUserSubs} from '../controllers/sub.controller.js'
 
 const subRoute = Router()
 
-subRoute.get('/',(req,res)=>res.send({titile:'GET all subscriptions'}))
+subRoute.get('/',getSubs)
 
-subRoute.get('/:id',(req,res)=>res.send({titile:'GET details'}))
+subRoute.get('/:id',authorize,getSubById)
 
 subRoute.post('/',authorize,createSub)
 
