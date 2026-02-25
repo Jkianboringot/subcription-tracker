@@ -1,4 +1,6 @@
+import { workflowClient } from "../config/upstash.js";
 import Sub from "../models/sub.model.js";
+import { SERVER_URL } from "../config/env.js";
 
 export const getSubs = async (req, res, next) => {
   try {
@@ -36,8 +38,17 @@ export const createSub = async (req, res, next) => {
       ...req.body,
       user: req.user._id,
     });
+    // {url,body,headers,workflowRunId,retries}
+    const {workflowRunId}=await workflowClient.trigger({
+      url: `${SERVER_URL}/api/v1/workflows/sub/reminder`,
+      body: { subId: sub.id },
+      headers: {
+        "content-type": "application/json",
+      },
+      retries: 0,
+    });
 
-    res.status(201).json({ success: true, data: sub });
+    res.status(201).json({ success: true, data: {sub,workflowRunId}});
   } catch (e) {
     next(e);
   }
@@ -46,7 +57,7 @@ export const createSub = async (req, res, next) => {
 export const getUserSubs = async (req, res, next) => {
   try {
     // check if the user is the same as the on in the token
-    if (req.user.id === req.params.id) {
+    if (req.user.id !== req.params.id) {
       const error = new Error("Your are not the owner of this account");
       error.status = 401;
       throw error;
